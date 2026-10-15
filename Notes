@@ -102,5 +102,21 @@ Orchestrating Game Generation,
 
 adventures in level design
 
+Hey Dennis; sorry for the long delay in getting back!
 
+LITERATURE
+ Your instinct is partly right: puzzle generation is thin and uses different words. I agree you should stop searching soon; but just as a check have you seen these already?
+- Valls-Vargas, Zhu & Ontañón (FDG 2017), Graph Grammar-based Controllable Generation of Puzzles: grammars set structure and difficulty, a model checker tests solvability. https://dl.acm.org/doi/10.1145/3102071.3102079
+- Cooper & Bazzaz (2025), A Constraint-Based Graph Grammar Approach Unifying Level and Playthrough Generation: keys and locks that stay solvable (no key behind its own lock). https://ceur-ws.org/Vol-4090/short5.pdf
+- Dormans (2010), Adventures in Level Design (missions first, space second). https://www.pcgworkshop.com/archive/dormans2010adventures.pdf
+- Smith, Butler & Popovic (2013), Quantifying over Play (solvable AND no unwanted solutions). https://grail.cs.washington.edu/wp-content/uploads/2015/08/smith2013qop.pdf
+
+PITFALLS I SEE
+ 1. Two rule sets. If the game and your solvability check each implement the mechanics, they can drift apart. Build one tile-based rules engine and have both use it. Free player movement on top is fine, but the checker should only see the tile logic.
+ 2. Solvable is not the same as having no dead ends. A room is solvable if some sequence of actions gets from the start to the goal, but it can still let the player reach a state from which nothing works. For example, a fire that burns the web also burns the key or a bridge you need, or a block gets pushed into a corner. A search from the start state only finds one winning path, so it will not catch these cases. They come from irreversible actions like burning, melting, pushing and breaking, whereas pure lock-and-key logic only adds to the inventory. You have three options. You can design them out (keys are not consumed, critical objects cannot be destroyed, blocks can be pulled as well as pushed). You can check for them by exploring all reachable states and rejecting any room where a reachable state cannot reach the goal. Or you can allow softlocks and add a room reset
+ 3. Unintended solutions. A room can be solvable in a way you never meant (skip the lock, use the wrong item). You could have the checker count solutions and shortest length, not only yes/no. That is also your difficulty measure.
+ 4. WFC and MarkovJunior: I'd leave them out until the rest works. They are decoration, and the checker has to run again afterwards.
+
+HOW I WOULD START
+ Start with the rules engine and the checker, and test them on three hand-made rooms (solvable, unsolvable, solvable with a shortcut). Then build the dumbest generator: place things randomly and reject what fails the check. Treat that as your baseline. Your smarter placement (locks one by one, regions) is then something you can measure against it: success rate, speed, variety. That gives you a result for the report even if the fancy parts take longer than planned.
 
